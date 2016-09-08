@@ -1,18 +1,18 @@
 package main
 
-import(
-    "fmt"
-    "flag"
-    log "logger"
-    "os"
+import (
+	"flag"
+	"fmt"
+	log "logger"
+	"os"
 
-    "github.com/verybluebot/tarinator-go"
+	"github.com/escribano/tarinator-go"
 )
 
 type stringsSlice []string
 
 func showHelp() {
-    fmt.Println(`
+	fmt.Println(`
 
 Usage: CLI Tarinator [OPTIONS]
 
@@ -27,79 +27,78 @@ Options:
     `)
 }
 
-
 func setFlag(flag *flag.FlagSet) {
-    flag.Usage = func() {
-        showHelp()
-    }
+	flag.Usage = func() {
+		showHelp()
+	}
 }
 
 func (i *stringsSlice) String() string {
-    return fmt.Sprintf("%s", *i)
+	return fmt.Sprintf("%s", *i)
 }
 
 func (i *stringsSlice) Set(value string) error {
-    *i = append(*i, value)
-    return nil
+	*i = append(*i, value)
+	return nil
 }
 
 func main() {
-    var files stringsSlice
-    flag.Var(&files, "c", "")
-    flag.Var(&files, "compress", "")
+	var files stringsSlice
+	flag.Var(&files, "c", "")
+	flag.Var(&files, "compress", "")
 
-    var target string
-    flag.StringVar(&target, "f", "", "")
-    flag.StringVar(&target, "file", "", "")
+	var target string
+	flag.StringVar(&target, "f", "", "")
+	flag.StringVar(&target, "file", "", "")
 
-    var extract string
-    flag.StringVar(&extract, "e", "", "")
-    flag.StringVar(&extract, "extract", "", "")
+	var extract string
+	flag.StringVar(&extract, "e", "", "")
+	flag.StringVar(&extract, "extract", "", "")
 
-    var sHelp bool
-    flag.BoolVar(&sHelp, "h", false, "")
-    flag.BoolVar(&sHelp, "help", false, "")
+	var sHelp bool
+	flag.BoolVar(&sHelp, "h", false, "")
+	flag.BoolVar(&sHelp, "help", false, "")
 
-    setFlag(flag.CommandLine)
+	setFlag(flag.CommandLine)
 
-    flag.Parse()
+	flag.Parse()
 
-    if sHelp {
-        showHelp()
-        return
-    }
+	if sHelp {
+		showHelp()
+		return
+	}
 
-    //header.GetHeader()
+	//header.GetHeader()
 
-    log.InitLogger()
+	log.InitLogger()
 
-    if target == "" {
-        log.Warningln("No target tar file was specified")
-        os.Exit(1)
-    }
+	if target == "" {
+		log.Warningln("No target tar file was specified")
+		os.Exit(1)
+	}
 
-    if len(files) > 0 {
-        for _, f := range files {
-            if _, err := os.Stat(f); os.IsNotExist(err) {
-                log.Errorf("File or direcotroy does not exists: %s", f)
-                os.Exit(1)
-            }
-        }
+	if len(files) > 0 {
+		for _, f := range files {
+			if _, err := os.Stat(f); os.IsNotExist(err) {
+				log.Errorf("File or direcotroy does not exists: %s", f)
+				os.Exit(1)
+			}
+		}
 
-        log.Printf("Start taring files/directories: %v", files)
-        err := tarinator.Tarinate(files, target)
-        if err != nil {
-            log.Errorf("Failed taring files: %s", err)
-            os.Exit(1)
-        }
-    }
+		log.Printf("Start taring files/directories: %v", files)
+		err := tarinator.Tarinate(files, target)
+		if err != nil {
+			log.Errorf("Failed taring files: %s", err)
+			os.Exit(1)
+		}
+	}
 
-    if extract != "" {
-        log.Printf("Start untaring files/directories: %v", files)
-        err := tarinator.UnTarinate(extract, target)
-        if err != nil {
-            log.Errorf("Failed untaring file: %s", err)
-            os.Exit(1)
-        }
-    }
+	if extract != "" {
+		log.Printf("Start untaring files/directories: %v", files)
+		err := tarinator.UnTarinate(extract, target)
+		if err != nil {
+			log.Errorf("Failed untaring file: %s", err)
+			os.Exit(1)
+		}
+	}
 }
